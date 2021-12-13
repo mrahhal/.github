@@ -51,15 +51,15 @@ jobs:
 
     - name: Build
       shell: pwsh
-      run: ./scripts build -HideBuildInfo
+      run: ./scripts build -NoBuildInfo
 
     - name: Test
       shell: pwsh
-      run: ./scripts test -HideBuildInfo
+      run: ./scripts test -NoBuildInfo
 
     - name: Pack
       shell: pwsh
-      run: ./scripts pack -HideBuildInfo
+      run: ./scripts pack -NoBuildInfo
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
