@@ -45,9 +45,27 @@ jobs:
       with:
         dotnet-version: ${{ inputs.dotnet-additional-version }}
 
+    - name: Print build info
+      shell: pwsh
+      run: ./scripts info
+
     - name: Build
       shell: pwsh
-      run: ./build -Pack
+      run: ./scripts build -HideBuildInfo
+
+    - name: Test
+      shell: pwsh
+      run: ./scripts test -HideBuildInfo
+
+    - name: Pack
+      shell: pwsh
+      run: ./scripts pack -HideBuildInfo
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifacts
+        path: artifacts
 
     - name: Analyze tag ${{ github.ref }}
       id: analyze_tag
@@ -61,12 +79,6 @@ jobs:
             echo "::set-output name=is_prerelease::true"
           fi
         fi
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: artifacts
-        path: artifacts
 
   release:
     needs: build
