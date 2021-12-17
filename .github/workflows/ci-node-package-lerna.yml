@@ -1,0 +1,72 @@
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: true
+        type: string
+      create-github-release:
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      NPM_TOKEN:
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: npm install
+      run: npm ci
+
+    - name: Build
+      run: |
+        npx lerna bootstrap
+        npx lerna run build
+
+    - name: Test
+      run: npx lerna run test:ci
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: needs.build.outputs.is_release == 'true'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ inputs.node-version }}
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Build
+      run: |
+        npm ci
+        npx lerna bootstrap
+        npx lerna run build
+
+    - name: Publish packages to npm
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      run: |
+        npx lerna publish from-package --yes --no-verify-access
+
+    - name: Create GitHub release
+      if: ${{ inputs.create-github-release }}
+      uses: ncipollo/release-action@v1
+      with:
+        prerelease: ${{ needs.build.outputs.is_prerelease }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        generateReleaseNotes: true
