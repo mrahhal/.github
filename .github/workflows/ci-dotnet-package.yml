@@ -16,7 +16,7 @@ on:
         type: string
         default: artifacts/packages/*.nupkg
     secrets:
-      NUGET_ORG_API_KEY:
+      NUGET_TOKEN:
         required: true
 
 env:
@@ -101,7 +101,7 @@ jobs:
         path: artifacts
 
     - name: Publish packages to nuget
-      run: dotnet nuget push ${{ inputs.packages-path }} --skip-duplicate --api-key ${{ secrets.NUGET_ORG_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ${{ inputs.packages-path }} --skip-duplicate --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
 
     - name: Create GitHub release
       if: ${{ inputs.create-github-release }}
