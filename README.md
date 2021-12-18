@@ -17,3 +17,7 @@ Template repo references:
 - https://github.com/mrahhal/template-roslyn-analyzer
 
 ### [ci-node-package-lerna.yml](.github/workflows/ci-node-package-lerna.yml)
+
+Template repo references:
+
+- https://github.com/mrahhal/template-angular-package
