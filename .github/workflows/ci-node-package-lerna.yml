@@ -35,6 +35,19 @@ jobs:
 
     - name: Test
       run: npx lerna run test:ci
+      
+    - name: Analyze tag ${{ github.ref }}
+      id: analyze_tag
+      shell: bash
+      run: |
+        if [[ ${{ github.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+          echo "Release tag detected"
+          echo "::set-output name=is_release::true"
+          if [[ ${{ github.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+.*- ]]; then
+            echo "Prerelease tag detected"
+            echo "::set-output name=is_prerelease::true"
+          fi
+        fi
 
   release:
     needs: build
