@@ -31,54 +31,54 @@ jobs:
       is_prerelease: ${{ steps.analyze_tag.outputs.is_prerelease }}
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Setup dotnet
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: ${{ inputs.dotnet-version }}
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ inputs.dotnet-version }}
 
-    - name: Setup additional dotnet
-      if: ${{ inputs.dotnet-additional-version }}
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: ${{ inputs.dotnet-additional-version }}
+      - name: Setup additional dotnet
+        if: ${{ inputs.dotnet-additional-version }}
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ inputs.dotnet-additional-version }}
 
-    - name: Print build info
-      shell: pwsh
-      run: ./scripts info
+      - name: Print build info
+        shell: pwsh
+        run: ./scripts info
 
-    - name: Build
-      shell: pwsh
-      run: ./scripts build -NoBuildInfo
+      - name: Build
+        shell: pwsh
+        run: ./scripts build -NoBuildInfo
 
-    - name: Test
-      shell: pwsh
-      run: ./scripts test -NoBuildInfo
+      - name: Test
+        shell: pwsh
+        run: ./scripts test -NoBuildInfo
 
-    - name: Pack
-      shell: pwsh
-      run: ./scripts pack -NoBuildInfo
+      - name: Pack
+        shell: pwsh
+        run: ./scripts pack -NoBuildInfo
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: artifacts
-        path: artifacts
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: artifacts
 
-    - name: Analyze tag ${{ github.ref }}
-      id: analyze_tag
-      shell: bash
-      run: |
-        if [[ ${{ github.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-          echo "Release tag detected"
-          echo "::set-output name=is_release::true"
-          if [[ ${{ github.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+.*- ]]; then
-            echo "Prerelease tag detected"
-            echo "::set-output name=is_prerelease::true"
+      - name: Analyze tag ${{ github.ref }}
+        id: analyze_tag
+        shell: bash
+        run: |
+          if [[ ${{ github.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "Release tag detected"
+            echo "::set-output name=is_release::true"
+            if [[ ${{ github.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+.*- ]]; then
+              echo "Prerelease tag detected"
+              echo "::set-output name=is_prerelease::true"
+            fi
           fi
-        fi
 
   release:
     needs: build
@@ -86,27 +86,27 @@ jobs:
     if: needs.build.outputs.is_release == 'true'
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Setup dotnet
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: ${{ inputs.dotnet-version }}
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ inputs.dotnet-version }}
 
-    - name: Download artifacts
-      uses: actions/download-artifact@v2
-      with:
-        name: artifacts
-        path: artifacts
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: artifacts
+          path: artifacts
 
-    - name: Publish packages to nuget
-      run: dotnet nuget push ${{ inputs.packages-path }} --skip-duplicate --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
+      - name: Publish packages to nuget
+        run: dotnet nuget push ${{ inputs.packages-path }} --skip-duplicate --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
 
-    - name: Create GitHub release
-      if: ${{ inputs.create-github-release }}
-      uses: ncipollo/release-action@v1
-      with:
-        prerelease: ${{ needs.build.outputs.is_prerelease }}
-        token: ${{ secrets.GITHUB_TOKEN }}
-        generateReleaseNotes: true
+      - name: Create GitHub release
+        if: ${{ inputs.create-github-release }}
+        uses: ncipollo/release-action@v1
+        with:
+          prerelease: ${{ needs.build.outputs.is_prerelease }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          generateReleaseNotes: true
