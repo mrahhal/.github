@@ -10,7 +10,7 @@ on:
       create-github-release:
         required: false
         type: boolean
-        default: true
+        default: false
       packages-path:
         required: false
         type: string
