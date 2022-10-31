@@ -9,7 +9,6 @@ Contains shared GitHub assets for my projects.
 This workflow assumes the existence of the following in the caller repo:
 
 - script.ps1
-- version.props
 
 Template repo references:
 
