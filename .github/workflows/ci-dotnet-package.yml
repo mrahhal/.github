@@ -15,6 +15,10 @@ on:
         required: false
         type: string
         default: artifacts/packages/*.nupkg
+      install-sql-server:
+        required: false
+        type: boolean
+        default: false
     secrets:
       NUGET_TOKEN:
         required: true
@@ -44,6 +48,12 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ inputs.dotnet-additional-version }}
+          
+      - name: Run the action
+        if: ${{ inputs.install-sql-server }}
+        uses: potatoqualitee/mssqlsuite@v1.7
+        with:
+          install: sqlengine, sqlpackage, localdb
 
       - name: Print build info
         shell: pwsh
